@@ -1,5 +1,6 @@
 package image;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -88,8 +89,34 @@ public class ImageManipulator {
 		return result;
 	}
 	
-	public int getPixelHSB(int x, int y, ColorElementType type)
+	public float getPixelHSB(int x, int y, ColorElementType type)
 	{
+		// Precondition
+		if (x < 0 || x >= imgSrc.getWidth() || y < 0 || y >= imgSrc.getHeight() || type == null 
+			|| type == ColorElementType.RED || type == ColorElementType.GREEN 
+			|| type == ColorElementType.BLUE)
+		{
+			throw new IllegalArgumentException();
+		}
+		
+		int[] pixelDataRGB = new int[3];
+		float[] pixelDataHSB = new float[3];
+		imgSrc.getData().getPixel(x, y, pixelDataRGB);
+		Color.RGBtoHSB(pixelDataRGB[0], pixelDataRGB[1], pixelDataRGB[2], pixelDataHSB);
+		float result = -1;
+		
+//		switch (type) {
+//		case HUE: result = pixelDataHSB[0];
+//		break;
+//		case GREEN: result = pixelData[1];
+//		break;
+//		case BLUE: result = pixelData[2];
+//		break;
+//		default:
+//			break;
+//		}
+		
+		
 		
 		return 0;
 		
@@ -121,12 +148,12 @@ public class ImageManipulator {
 		
 	}
 	
-	public void setPixelHSB(int x, int y, int[] pixelData)
+	public void setPixelHSB(int x, int y, float[] pixelData)
 	{
 		
 	}
 	
-	public int[] getPixelHSB(int x, int y)
+	public float[] getPixelHSB(int x, int y)
 	{
 		return null;
 	}
