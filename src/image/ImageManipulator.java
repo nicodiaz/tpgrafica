@@ -26,12 +26,17 @@ public class ImageManipulator {
 	}
 	
 	public ImageManipulator(BufferedImage imgSrc) {
-		this.imgSrc = imgSrc;
+		// Preconditions
+		if (imgSrc == null)
+		{
+			throw new IllegalArgumentException();
+		}
 		
+		this.imgSrc = imgSrc;
 	}
 	
 	public void applyGrayscale() {
-		
+		//TODO: Complete this function
 	}
 	
 	@Override
@@ -106,6 +111,13 @@ public class ImageManipulator {
 	
 	public void setPixelRGB(int x, int y, int[] pixelData)
 	{
+		// Precondition
+		if (x < 0 || x >= imgSrc.getWidth() || y < 0 || y >= imgSrc.getHeight() || pixelData == null)
+		{
+			throw new IllegalArgumentException();
+		}
+		
+		imgSrc.getRaster().setPixel(x, y, pixelData);
 		
 	}
 	
