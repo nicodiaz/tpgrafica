@@ -9,5 +9,5 @@ public interface Inpaintable {
 	 * @param mask The mask that indicates the area to be inpainted.
 	 * @return The inpainted image.
 	 */
-	public ImageManipulator inpaint (ImageManipulator img, ImageManipulator mask);
+	public ImageManipulator inpaint (ImageManipulator img, Mask mask);
 }
