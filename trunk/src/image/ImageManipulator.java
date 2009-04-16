@@ -89,6 +89,10 @@ public class ImageManipulator {
 		return result;
 	}
 	
+	/*
+	 * Recover a single pixel value for any channel in HSB SYSTEN(HUE, SATURATION OR BRIGHT).
+	 * Return -1 in error case
+	 */
 	public float getPixelHSB(int x, int y, ColorElementType type)
 	{
 		// Precondition
@@ -104,22 +108,19 @@ public class ImageManipulator {
 		imgSrc.getData().getPixel(x, y, pixelDataRGB);
 		Color.RGBtoHSB(pixelDataRGB[0], pixelDataRGB[1], pixelDataRGB[2], pixelDataHSB);
 		float result = -1;
+	
+		switch (type) {
+			case HUE: result = pixelDataHSB[0];
+				break;
+			case SAT: result = pixelDataHSB[1];
+				break;
+			case BRIGHT: result = pixelDataHSB[2];
+				break;
+			default:
+				break;
+		}
 		
-//		switch (type) {
-//		case HUE: result = pixelDataHSB[0];
-//		break;
-//		case GREEN: result = pixelData[1];
-//		break;
-//		case BLUE: result = pixelData[2];
-//		break;
-//		default:
-//			break;
-//		}
-		
-		
-		
-		return 0;
-		
+		return result;
 	}
 	
 	public int[] getPixelRGB(int x, int y)
@@ -150,12 +151,32 @@ public class ImageManipulator {
 	
 	public void setPixelHSB(int x, int y, float[] pixelData)
 	{
+		// Precondition
+		if (x < 0 || x >= imgSrc.getWidth() || y < 0 || y >= imgSrc.getHeight() || pixelData == null)
+		{
+			throw new IllegalArgumentException();
+		}
+		
+		int rgbData = Color.HSBtoRGB(pixelData[0], pixelData[1], pixelData[2]);
+		
+		imgSrc.setRGB(x, y, rgbData);
 		
 	}
 	
 	public float[] getPixelHSB(int x, int y)
 	{
-		return null;
+		// Precondition
+		if (x < 0 || x >= imgSrc.getWidth() || y < 0 || y >= imgSrc.getHeight())
+		{
+			throw new IllegalArgumentException();
+		}
+		
+		int[] pixelDataRGB = new int[3];
+		float[] pixelDataHSB = new float[3];
+		imgSrc.getData().getPixel(x, y, pixelDataRGB);
+		Color.RGBtoHSB(pixelDataRGB[0], pixelDataRGB[1], pixelDataRGB[2], pixelDataHSB);
+		
+		return pixelDataHSB;
 	}
 	
 	public void saveToFile(String fileName) throws IOException
