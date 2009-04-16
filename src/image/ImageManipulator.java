@@ -8,6 +8,7 @@ import javax.imageio.ImageIO;
 
 public class ImageManipulator {
 	private BufferedImage imgSrc = null;
+	private String filePath = null;
 	
 	public ImageManipulator( String fileName ) throws IOException {
 		
@@ -17,12 +18,15 @@ public class ImageManipulator {
 			throw new IllegalArgumentException();
 		}
 
-		imgSrc = ImageIO.read(new File(fileName));
+		File imgFile = new File(fileName);
+		imgSrc = ImageIO.read(imgFile);
 			
 		
+		filePath = imgFile.getCanonicalPath();
 	}
 	
 	public ImageManipulator( BufferedImage imgSrc ) {
+		this.imgSrc = imgSrc;
 		
 	}
 	
@@ -32,14 +36,28 @@ public class ImageManipulator {
 	
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
-		// TODO Auto-generated method stub
-		return super.clone();
+		
+		ImageManipulator theClone = null;
+		
+		try {
+			theClone = new ImageManipulator(filePath);
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new CloneNotSupportedException();
+		}
+
+		return theClone;
 	}
 	
+	
+
+	// HSB O RGB????
 	public int getPixel( int x, int y, ColorElementType type )
 	{
 		return 0;
 	}
+	
+	
 	
 	public void saveToFile(String fileName) throws IOException
 	{
@@ -55,8 +73,6 @@ public class ImageManipulator {
 			BufferedImage.TYPE_INT_RGB);
 				
 		ImageIO.write(imgDst, "jpg", new File(fileName));
-		
-		
 		
 	}
 	
