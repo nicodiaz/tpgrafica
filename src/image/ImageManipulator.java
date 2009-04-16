@@ -59,5 +59,16 @@ public class ImageManipulator {
 		
 		
 	}
+	
+	public int getWidth()
+	{
+		return imgSrc.getWidth();
+	}
+	
+	public int getHeight()
+	{
+		return imgSrc.getHeight();
+	}
+	
 
 }
