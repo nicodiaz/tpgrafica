@@ -39,6 +39,6 @@ public class Mask extends ImageManipulator {
 	}
 	
 	public void unMark(int x, int y) {
-		this.setPixelHSB(x, y, maskNoMark);
+		this.setPixelRGB(x, y, maskNoMark);
 	}
 }
