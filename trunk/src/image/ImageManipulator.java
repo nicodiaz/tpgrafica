@@ -51,25 +51,36 @@ public class ImageManipulator {
 	
 	
 
-	// HSB O RGB????
+	/*
+	 * Recover a single pixel value for any channel (RED GREEN OR BLUE).
+	 * Return -1 in error case
+	 */
 	public int getPixelRGB(int x, int y, ColorElementType type)
 	{
 		
 		// Precondition
-		if (x < 0 || x >= imgSrc.getWidth() || y < 0 || y >= imgSrc.getHeight()
-			|| type == null || (type != ColorElementType.RED && type != ColorElementType.GREEN 
-					&& type != ColorElementType.BLUE))
+		if (x < 0 || x >= imgSrc.getWidth() || y < 0 || y >= imgSrc.getHeight() || type == null 
+			|| type == ColorElementType.HUE || type == ColorElementType.SAT	|| type == ColorElementType.BRIGHT)
 		{
 			throw new IllegalArgumentException();
 		}
 		
+		int[] pixelData = new int[3];
+		int result = -1;
+		imgSrc.getData().getPixel(x, y, pixelData);
 		
+		switch (type) {
+			case RED: result = pixelData[0];
+				break;
+			case GREEN: result = pixelData[1];
+				break;
+			case BLUE: result = pixelData[2];
+				break;
+			default:
+				break;
+		}
 		
-		
-		
-		
-		
-		return 0;
+		return result;
 	}
 	
 	public int getPixelHSB(int x, int y, ColorElementType type)
@@ -81,7 +92,26 @@ public class ImageManipulator {
 	
 	public int[] getPixelRGB(int x, int y)
 	{
-		return null;
+		// Precondition
+		if (x < 0 || x >= imgSrc.getWidth() || y < 0 || y >= imgSrc.getHeight())
+		{
+			throw new IllegalArgumentException();
+		}
+		
+		int[] pixelData = new int[3];
+		imgSrc.getData().getPixel(x, y, pixelData);
+		
+		return pixelData;
+	}
+	
+	public void setPixelRGB(int x, int y, int[] pixelData)
+	{
+		
+	}
+	
+	public void setPixelHSB(int x, int y, int[] pixelData)
+	{
+		
 	}
 	
 	public int[] getPixelHSB(int x, int y)
