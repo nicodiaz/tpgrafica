@@ -10,7 +10,7 @@ public class ImageManipulator {
 	private BufferedImage imgSrc = null;
 	private String filePath = null;
 	
-	public ImageManipulator( String fileName ) throws IOException {
+	public ImageManipulator(String fileName) throws IOException {
 		
 		// Preconditions
 		if (fileName == null)
@@ -25,12 +25,12 @@ public class ImageManipulator {
 		filePath = imgFile.getCanonicalPath();
 	}
 	
-	public ImageManipulator( BufferedImage imgSrc ) {
+	public ImageManipulator(BufferedImage imgSrc) {
 		this.imgSrc = imgSrc;
 		
 	}
 	
-	public void applyGrayscale( ) {
+	public void applyGrayscale() {
 		
 	}
 	
@@ -52,12 +52,42 @@ public class ImageManipulator {
 	
 
 	// HSB O RGB????
-	public int getPixel( int x, int y, ColorElementType type )
+	public int getPixelRGB(int x, int y, ColorElementType type)
 	{
+		
+		// Precondition
+		if (x < 0 || x >= imgSrc.getWidth() || y < 0 || y >= imgSrc.getHeight()
+			|| type == null || (type != ColorElementType.RED && type != ColorElementType.GREEN 
+					&& type != ColorElementType.BLUE))
+		{
+			throw new IllegalArgumentException();
+		}
+		
+		
+		
+		
+		
+		
+		
 		return 0;
 	}
 	
+	public int getPixelHSB(int x, int y, ColorElementType type)
+	{
+		
+		return 0;
+		
+	}
 	
+	public int[] getPixelRGB(int x, int y)
+	{
+		return null;
+	}
+	
+	public int[] getPixelHSB(int x, int y)
+	{
+		return null;
+	}
 	
 	public void saveToFile(String fileName) throws IOException
 	{
