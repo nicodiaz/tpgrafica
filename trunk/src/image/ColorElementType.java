@@ -1,6 +1,6 @@
 package image;
 
-public enum ColorElementType {
-	RED, GREEN, BLUE,
-	HUE, SAT, BRIGHT
+public enum ColorElementType
+{
+	RED, GREEN, BLUE, HUE, SAT, BRIGHT
 }
