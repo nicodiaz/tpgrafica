@@ -24,6 +24,7 @@ public class Mask extends ImageManipulator {
 	public Mask (String fileName, int [] markColor, int [] noMarkColor) throws IOException {
 		super(fileName);
 		maskMark = new int[3];
+		maskNoMark = new int[3];
 		maskMark[0] = markColor[0];
 		maskMark[1] = markColor[1];
 		maskMark[2] = markColor[2];
