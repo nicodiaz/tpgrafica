@@ -36,36 +36,36 @@ public class YanInpainter implements Inpaintable {
 		}
 
 		for (ringHeight = mask.getHeight(), ringWidth = mask.getWidth(); ringHeight > 0
-				|| ringWidth > 0; ringHeight--, ringWidth--) {
+				&& ringWidth > 0; ringHeight--, ringWidth--) {
 			// We iterate through the rectangle
-
+			System.out.println("Ancho: " + ringWidth + "Alto: " + ringHeight );
 			// top side
 			for (rowIdx = 0, colIdx = 0; colIdx < ringWidth; colIdx++) {
-				if (mask.isMarked(rowIdx, colIdx)) {
-					result.setPixelHSB(rowIdx, colIdx, inpaintPixel(img, mask,
-							rowIdx, colIdx));
+				if (mask.isMarked(colIdx, rowIdx)) {
+					result.setPixelHSB(colIdx, rowIdx, inpaintPixel(img, mask,
+							colIdx, rowIdx));
 				}
 
 			}
 			// right side
 			for (colIdx = ringWidth - 1, rowIdx = 1; rowIdx < ringHeight; rowIdx++) {
-				if (mask.isMarked(rowIdx, colIdx)) {
-					result.setPixelHSB(rowIdx, colIdx, inpaintPixel(img, mask,
-							rowIdx, colIdx));
+				if (mask.isMarked(colIdx, rowIdx)) {
+					result.setPixelHSB(colIdx, rowIdx, inpaintPixel(img, mask,
+							colIdx, rowIdx ));
 				}
 			}
 			// bottom side
 			for (rowIdx = ringHeight - 1, colIdx = ringWidth - 2; colIdx >= 0; colIdx--) {
-				if (mask.isMarked(rowIdx, colIdx)) {
-					result.setPixelHSB(rowIdx, colIdx, inpaintPixel(img, mask,
-							rowIdx, colIdx));
+				if (mask.isMarked(colIdx, rowIdx)) {
+					result.setPixelHSB(colIdx, rowIdx, inpaintPixel(img, mask,
+							colIdx, rowIdx));
 				}
 			}
 			// left side
 			for (colIdx = 0, rowIdx = ringHeight - 2; rowIdx >= 0; rowIdx--) {
-				if (mask.isMarked(rowIdx, colIdx)) {
-					result.setPixelHSB(rowIdx, colIdx, inpaintPixel(img, mask,
-							rowIdx, colIdx));
+				if (mask.isMarked(colIdx, rowIdx)) {
+					result.setPixelHSB(colIdx, rowIdx, inpaintPixel(img, mask,
+							colIdx, rowIdx));
 				}
 			}
 			// mark the ring as NoMark in order to be considered as information
@@ -134,19 +134,19 @@ public class YanInpainter implements Inpaintable {
 
 		// top side
 		for (rowIdx = 0, colIdx = 0; colIdx < ringWidth; colIdx++) {
-			mask.unMark(rowIdx, colIdx);
+			mask.unMark(colIdx, rowIdx);
 		}
 		// right side
 		for (colIdx = ringWidth - 1, rowIdx = 1; rowIdx < ringHeight; rowIdx++) {
-			mask.unMark(rowIdx, colIdx);
+			mask.unMark(colIdx, rowIdx);
 		}
 		// bottom side
 		for (rowIdx = ringHeight - 1, colIdx = ringWidth - 2; colIdx >= 0; colIdx--) {
-			mask.unMark(rowIdx, colIdx);
+			mask.unMark(colIdx, rowIdx);
 		}
 		// left side
 		for (colIdx = 0, rowIdx = ringHeight - 2; rowIdx >= 0; rowIdx--) {
-			mask.unMark(rowIdx, colIdx);
+			mask.unMark(colIdx, rowIdx);
 		}
 	}
 }
