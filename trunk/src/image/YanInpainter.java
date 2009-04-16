@@ -39,6 +39,8 @@ public class YanInpainter implements Inpaintable
 			result = (ImageManipulator) img.clone();
 		} catch (CloneNotSupportedException e)
 		{
+			// Just for debug
+			e.printStackTrace();
 			return null;
 		}
 
@@ -46,7 +48,7 @@ public class YanInpainter implements Inpaintable
 				&& ringWidth > 0; ringHeight--, ringWidth--)
 		{
 			// We iterate through the rectangle
-			System.out.println("Ancho: " + ringWidth + "Alto: " + ringHeight);
+			System.out.println("Ancho: " + ringWidth + " Alto: " + ringHeight);
 			// top side
 			for (rowIdx = 0, colIdx = 0; colIdx < ringWidth; colIdx++)
 			{

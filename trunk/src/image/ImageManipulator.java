@@ -2,15 +2,15 @@ package image;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-public class ImageManipulator
+public class ImageManipulator implements Cloneable
 {
 	private BufferedImage imgSrc = null;
-	private String filePath = null;
 
 	public ImageManipulator(String fileName) throws IOException
 	{
@@ -23,8 +23,6 @@ public class ImageManipulator
 
 		File imgFile = new File(fileName);
 		imgSrc = ImageIO.read(imgFile);
-
-		filePath = imgFile.getCanonicalPath();
 	}
 
 	public ImageManipulator(BufferedImage imgSrc)
@@ -46,19 +44,14 @@ public class ImageManipulator
 	@Override
 	protected Object clone() throws CloneNotSupportedException
 	{
+		WritableRaster dstWrite = imgSrc.copyData(null);
 
-		ImageManipulator theClone = null;
+		BufferedImage imgDst = new BufferedImage(imgSrc.getWidth(), imgSrc
+				.getHeight(), BufferedImage.TYPE_INT_RGB);
+		
+		imgDst.setData(dstWrite);
 
-		try
-		{
-			theClone = new ImageManipulator(filePath);
-		} catch (IOException e)
-		{
-			e.printStackTrace();
-			throw new CloneNotSupportedException();
-		}
-
-		return theClone;
+		return (new ImageManipulator(imgDst));
 	}
 
 	/*
