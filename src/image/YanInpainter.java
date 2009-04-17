@@ -1,5 +1,7 @@
 package image;
 
+import java.awt.Point;
+
 public class YanInpainter implements Inpaintable
 {
 
@@ -26,14 +28,12 @@ public class YanInpainter implements Inpaintable
 	public ImageManipulator inpaint(ImageManipulator img, Mask mask)
 	{
 		if (img == null || mask == null || img.getWidth() != mask.getWidth()
-				|| img.getHeight() != mask.getHeight())
-		{
+				|| img.getHeight() != mask.getHeight()) {
 			throw new IllegalArgumentException();
 		}
 
 		ImageManipulator result = null;
-		int ringWidth, ringHeight, rowIdx, colIdx;
-
+		
 		try
 		{
 			result = (ImageManipulator) img.clone();
@@ -44,59 +44,37 @@ public class YanInpainter implements Inpaintable
 			return null;
 		}
 
-		for (ringHeight = mask.getHeight(), ringWidth = mask.getWidth(); ringHeight > 0
-				&& ringWidth > 0; ringHeight--, ringWidth--)
-		{
-			// We iterate through the rectangle
-			System.out.println("Ancho: " + ringWidth + " Alto: " + ringHeight);
-			// top side
-			for (rowIdx = 0, colIdx = 0; colIdx < ringWidth; colIdx++)
-			{
-				if (mask.isMarked(colIdx, rowIdx))
-				{
-					result.setPixelHSB(colIdx, rowIdx, inpaintPixel(img, mask,
-							colIdx, rowIdx));
+		int x, y, ring = 0;
+		int min =  Math.min(result.getWidth(), result.getHeight());
+		int ringCount = min / 2;
+		int imgHeight = img.getHeight();
+		int imgWidth = img.getHeight();
+		int ringHeight;
+		int ringWidth;
+		// Calcular las coordenadas finales de x e y
+		
+		for (ring = 0; ring < ringCount; ring ++ ) {
+			for (x = 0; x < imgWidth; x++) {
+				for(y = 0; y < imgHeight; y++) {
+					ringHeight = imgHeight - 2 * ring;
+					ringWidth = imgWidth - 2 * ring;
+					if (pixelInRing(x, y, ring, ringWidth, ringHeight) && mask.isMarked(x, y)) {
+						inpaintPixel(img, mask, x, y);
+					}
+						
 				}
-
-			}
-			// right side
-			for (colIdx = ringWidth - 1, rowIdx = 1; rowIdx < ringHeight; rowIdx++)
-			{
-				if (mask.isMarked(colIdx, rowIdx))
-				{
-					result.setPixelHSB(colIdx, rowIdx, inpaintPixel(img, mask,
-							colIdx, rowIdx));
-				}
-			}
-			// bottom side
-			for (rowIdx = ringHeight - 1, colIdx = ringWidth - 2; colIdx >= 0; colIdx--)
-			{
-				if (mask.isMarked(colIdx, rowIdx))
-				{
-					result.setPixelHSB(colIdx, rowIdx, inpaintPixel(img, mask,
-							colIdx, rowIdx));
-				}
-			}
-			// left side
-			for (colIdx = 0, rowIdx = ringHeight - 2; rowIdx >= 0; rowIdx--)
-			{
-				if (mask.isMarked(colIdx, rowIdx))
-				{
-					result.setPixelHSB(colIdx, rowIdx, inpaintPixel(img, mask,
-							colIdx, rowIdx));
-				}
-			}
-			// mark the ring as NoMark in order to be considered as information
-			// later.
-			if (!considerCurrentIteration)
-			{
-				unmarkRing(mask, ringWidth, ringHeight);
 			}
 		}
+	
 
 		return result;
 	}
 
+	private boolean pixelInRing(int x, int y, int ring, int width, int height)
+	{
+		return (x >= ring && x <= ring + width && y >= ring && y <= ring + height);
+	}
+	
 	/**
 	 * 
 	 * @param img
