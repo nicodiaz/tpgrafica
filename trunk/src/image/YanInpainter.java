@@ -1,7 +1,9 @@
 package image;
 
-import java.awt.Point;
-
+/**
+ * @author Hari
+ *
+ */
 public class YanInpainter implements Inpaintable
 {
 
@@ -25,15 +27,30 @@ public class YanInpainter implements Inpaintable
 		this.considerCurrentIteration = considerCurrentIteration;
 	}
 
+	
+	
+	/**
+	 * 
+	 * ATENTION: When this method returns, the mask is MODIFIED.
+	 * TODO: Implement clone en Mask Class.
+	 * 
+	 * @param img
+	 *            The image to be inpainted
+	 * @param mask
+	 *            The mask to be used in the inpainted zone (wich Zone?? - Header zone!!)
+	 *            
+	 * @return The image modified, inpaint applied.
+	 */
 	public ImageManipulator inpaint(ImageManipulator img, Mask mask)
 	{
 		if (img == null || mask == null || img.getWidth() != mask.getWidth()
-				|| img.getHeight() != mask.getHeight()) {
+				|| img.getHeight() != mask.getHeight())
+		{
 			throw new IllegalArgumentException();
 		}
 
 		ImageManipulator result = null;
-		
+
 		try
 		{
 			result = (ImageManipulator) img.clone();
@@ -45,38 +62,89 @@ public class YanInpainter implements Inpaintable
 		}
 
 		int x, y, ring = 0;
-		int min =  Math.min(result.getWidth(), result.getHeight());
+
+		// We count the number of rings
+		int min = Math.min(result.getWidth(), result.getHeight());
 		int ringCount = min / 2;
+
 		int imgHeight = img.getHeight();
-		int imgWidth = img.getHeight();
+		int imgWidth = img.getWidth();
 		int ringHeight;
 		int ringWidth;
-		// Calcular las coordenadas finales de x e y
+
+		// Borrar esta linea:
+		int[] pixelToSave = null;
 		
-		for (ring = 0; ring < ringCount; ring ++ ) {
-			for (x = 0; x < imgWidth; x++) {
-				for(y = 0; y < imgHeight; y++) {
-					ringHeight = imgHeight - 2 * ring;
-					ringWidth = imgWidth - 2 * ring;
-					if (pixelInRing(x, y, ring, ringWidth, ringHeight) && mask.isMarked(x, y)) {
-						inpaintPixel(img, mask, x, y);
-					}
+		// At first, the first ring matches with the image dimensions.
+		ring = 0;
+		ringHeight = imgHeight;
+		ringWidth = imgWidth;
+		while(ring < ringCount)
+		{
+			for (x = ring; x < ringWidth; x++)
+			{
+				for (y = ring; y < ringHeight; y++)
+				{
+					if (pixelInRing(x, y, ring, ringWidth, ringHeight) && mask.isMarked(x, y))
+					{
+//						inpaintPixel(result, mask, x, y);
+						pixelToSave = inpaintUsingRGB(result, mask, x, y);
 						
+						if (pixelToSave != null)
+						{
+							result.setPixelRGB(x, y, pixelToSave);
+						}
+					}
 				}
 			}
+			
+			// Now we must mark the circle in the mask
+			// Podria mejorarse esto...
+			for (x = ring; x < ringWidth; x++)
+			{
+				for (y = ring; y < ringHeight; y++)
+				{
+					if (pixelInRing(x, y, ring, ringWidth, ringHeight) && mask.isMarked(x, y))
+					{
+						mask.unMark(x, y);
+					}
+				}
+			}
+			
+			// We must set the next ring limits
+			ring++;			
+			ringHeight = imgHeight - ring;
+			ringWidth = imgWidth - ring;
 		}
-	
-
+		
 		return result;
 	}
 
+	/**
+	 * @param x
+	 *            The X coordinate of the pixel
+	 * @param y
+	 *            The Y coordinate of the pixel
+	 * @param ring
+	 *            The number of the working ring
+	 * @param width
+	 *            The ring width
+	 * @param height
+	 *            The ring height
+	 * @return True if the pixel is contained in the ring, false otherwise
+	 */
 	private boolean pixelInRing(int x, int y, int ring, int width, int height)
 	{
-		return (x >= ring && x <= ring + width && y >= ring && y <= ring + height);
+		// Preconditions
+		if (x < 0 || y < 0 || ring < 0 || width < 0 || height < 0)
+		{
+			throw new IllegalArgumentException();
+		}
+
+		return (x >= ring && x < (ring + width) && y >= ring && y < (ring + height));
 	}
-	
+
 	/**
-	 * 
 	 * @param img
 	 *            The image which pixel will be inpainted.
 	 * @param mask
@@ -90,6 +158,13 @@ public class YanInpainter implements Inpaintable
 	 */
 	private float[] inpaintPixel(ImageManipulator img, Mask mask, int x, int y)
 	{
+		// Preconditions
+		if (img == null || mask == null || x < 0 || y < 0)
+		{
+			throw new IllegalArgumentException();
+		}
+		
+		
 		int[][] directions = { { 1, 1 }, { 1, 0 }, { 1, -1 }, { 0, -1 },
 				{ -1, -1 }, { -1, 0 }, { -1, 1 }, { 0, 1 } };
 		float[] accum = new float[3];
@@ -97,14 +172,15 @@ public class YanInpainter implements Inpaintable
 		int sumCount = 0;
 		int newX;
 		int newY;
+		int width = img.getWidth();
+		int height = img.getHeight();
 
 		for (int[] direction : directions)
 		{
 			newX = x + direction[0];
 			newY = y + direction[1];
 
-			if (newX >= 0 && newX < img.getWidth() && newY >= 0
-					&& newY < img.getHeight())
+			if (newX >= 0 && newX < width && newY >= 0	&& newY < height)
 			{
 				if (!mask.isMarked(newX, newY))
 				{
@@ -127,34 +203,104 @@ public class YanInpainter implements Inpaintable
 		{
 			mask.unMark(x, y);
 		}
+		
+		// Now we can set the pixel
+		img.setPixelHSB(x, y, accum);
+		
+//		System.out.println("Inpaintee el pixel: (" + x + ", " + y + ").");
 
 		return accum;
 
 	}
 
-	private void unmarkRing(Mask mask, int ringWidth, int ringHeight)
+//	private void unmarkRing(Mask mask, int ringWidth, int ringHeight)
+//	{
+//		int rowIdx, colIdx;
+//
+//		// top side
+//		for (rowIdx = 0, colIdx = 0; colIdx < ringWidth; colIdx++)
+//		{
+//			mask.unMark(colIdx, rowIdx);
+//		}
+//		// right side
+//		for (colIdx = ringWidth - 1, rowIdx = 1; rowIdx < ringHeight; rowIdx++)
+//		{
+//			mask.unMark(colIdx, rowIdx);
+//		}
+//		// bottom side
+//		for (rowIdx = ringHeight - 1, colIdx = ringWidth - 2; colIdx >= 0; colIdx--)
+//		{
+//			mask.unMark(colIdx, rowIdx);
+//		}
+//		// left side
+//		for (colIdx = 0, rowIdx = ringHeight - 2; rowIdx >= 0; rowIdx--)
+//		{
+//			mask.unMark(colIdx, rowIdx);
+//		}
+//	}
+	
+	
+	private int[] inpaintUsingRGB(ImageManipulator img, Mask mask, int x, int y)
 	{
-		int rowIdx, colIdx;
-
-		// top side
-		for (rowIdx = 0, colIdx = 0; colIdx < ringWidth; colIdx++)
+		// Preconditions
+		if (img == null || mask == null || x < 0 || y < 0)
 		{
-			mask.unMark(colIdx, rowIdx);
+			throw new IllegalArgumentException();
 		}
-		// right side
-		for (colIdx = ringWidth - 1, rowIdx = 1; rowIdx < ringHeight; rowIdx++)
+		
+		
+		int[][] directions = { { 1, 1 }, { 1, 0 }, { 1, -1 }, { 0, -1 },
+				{ -1, -1 }, { -1, 0 }, { -1, 1 }, { 0, 1 } };
+		int[] accum = {0, 0, 0};
+		int[] color;
+		
+		// sumCount has the number of pure pixel used
+		int sumCount = 0;
+		int newX;
+		int newY;
+		int width = img.getWidth();
+		int height = img.getHeight();
+		
+		for (int[] direction : directions)
 		{
-			mask.unMark(colIdx, rowIdx);
+			newX = x + direction[0];
+			newY = y + direction[1];
+			
+			if (newX >= 0 && newX < width && newY >= 0	&& newY < height)
+			{
+				if (!mask.isMarked(newX, newY))
+				{
+					// Is a pure pixel
+					sumCount++;
+					color = img.getPixelRGB(newX, newY);
+					accum[0] += color[0];
+					accum[1] += color[1];
+					accum[2] += color[2];
+				}
+			}
 		}
-		// bottom side
-		for (rowIdx = ringHeight - 1, colIdx = ringWidth - 2; colIdx >= 0; colIdx--)
+		
+		// If sumCount is zero, no pure pixel was used, and must return null 
+		if (sumCount == 0)
 		{
-			mask.unMark(colIdx, rowIdx);
+			return null;
 		}
-		// left side
-		for (colIdx = 0, rowIdx = ringHeight - 2; rowIdx >= 0; rowIdx--)
+		
+		accum[0] /= sumCount;
+		accum[1] /= sumCount;
+		accum[2] /= sumCount;
+		
+		// if the considerCurrentIteration is set to true we must unmark the
+		// pixel in the mask
+		if (considerCurrentIteration)
 		{
-			mask.unMark(colIdx, rowIdx);
+			mask.unMark(x, y);
 		}
+		
+		// Now we can set the pixel
+//		img.setPixelRGB(x, y, accum);
+		
+		return accum;
+		
 	}
 }

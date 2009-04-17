@@ -14,9 +14,8 @@ public class Runner
 
 		if (args.length != 2)
 		{
-			System.err
-					.println("Debe ingresar el nombre del archivo de imagen y el nombre del"
-							+ "archivo con la mascara");
+			System.err.println("Debe ingresar el nombre del archivo de imagen y el nombre del"
+				+ "archivo con la mascara");
 			System.err.println("Ejemplo: java Runner image.jpg mask.jpg");
 			System.exit(1);
 		}
@@ -30,8 +29,9 @@ public class Runner
 			Mask mask = new Mask(args[1], whiteArray, blackArray);
 
 			YanInpainter yaniImpaint = new YanInpainter(false);
-			yaniImpaint.inpaint(image, mask);
-			image.saveToFile("outputIn.jpg");
+			ImageManipulator imgInpainted = yaniImpaint.inpaint(image, mask);
+			imgInpainted.saveToFile("inpainted.jpg");
+			mask.saveToFile("maskResult.jpg");
 
 			// yaniImpaint.setConsiderCurrentIteration(true);
 			// yaniImpaint.inpaint(image, mask);
