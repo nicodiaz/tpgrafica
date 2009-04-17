@@ -2,6 +2,7 @@ package image;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
@@ -11,6 +12,10 @@ import javax.imageio.ImageIO;
 public class ImageManipulator implements Cloneable
 {
 	private BufferedImage imgSrc = null;
+	private Raster imgRaster = null;
+	private WritableRaster imgWriteRaster = null;
+	private int width = -1;
+	private int height = -1;
 
 	public ImageManipulator(String fileName) throws IOException
 	{
@@ -23,6 +28,11 @@ public class ImageManipulator implements Cloneable
 
 		File imgFile = new File(fileName);
 		imgSrc = ImageIO.read(imgFile);
+		
+		imgRaster = imgSrc.getData();
+		imgWriteRaster = imgSrc.getRaster();
+		width = imgSrc.getWidth();
+		height = imgSrc.getHeight();
 	}
 
 	public ImageManipulator(BufferedImage imgSrc)
@@ -34,6 +44,10 @@ public class ImageManipulator implements Cloneable
 		}
 
 		this.imgSrc = imgSrc;
+		imgRaster = imgSrc.getData();
+		imgWriteRaster = imgSrc.getRaster();
+		width = imgSrc.getWidth();
+		height = imgSrc.getHeight();
 	}
 
 	public void applyGrayscale()
@@ -46,7 +60,7 @@ public class ImageManipulator implements Cloneable
 	{
 		WritableRaster dstWrite = imgSrc.copyData(null);
 
-		BufferedImage imgDst = new BufferedImage(imgSrc.getWidth(), imgSrc.getHeight(), BufferedImage.TYPE_INT_RGB);
+		BufferedImage imgDst = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		
 		imgDst.setData(dstWrite);
 
@@ -61,7 +75,7 @@ public class ImageManipulator implements Cloneable
 	{
 
 		// Precondition
-		if (x < 0 || x >= imgSrc.getWidth() || y < 0 || y >= imgSrc.getHeight()
+		if (x < 0 || x >= width || y < 0 || y >= height
 				|| type == null || type == ColorElementType.HUE
 				|| type == ColorElementType.SAT
 				|| type == ColorElementType.BRIGHT)
@@ -71,21 +85,21 @@ public class ImageManipulator implements Cloneable
 
 		int[] pixelData = new int[3];
 		int result = -1;
-		imgSrc.getData().getPixel(x, y, pixelData);
+		imgRaster.getPixel(x, y, pixelData);
 
 		switch (type)
 		{
-		case RED:
-			result = pixelData[0];
-			break;
-		case GREEN:
-			result = pixelData[1];
-			break;
-		case BLUE:
-			result = pixelData[2];
-			break;
-		default:
-			break;
+			case RED:
+				result = pixelData[0];
+				break;
+			case GREEN:
+				result = pixelData[1];
+				break;
+			case BLUE:
+				result = pixelData[2];
+				break;
+			default:
+				break;
 		}
 
 		return result;
@@ -98,7 +112,7 @@ public class ImageManipulator implements Cloneable
 	public float getPixelHSB(int x, int y, ColorElementType type)
 	{
 		// Precondition
-		if (x < 0 || x >= imgSrc.getWidth() || y < 0 || y >= imgSrc.getHeight()
+		if (x < 0 || x >= width || y < 0 || y >= height
 				|| type == null || type == ColorElementType.RED
 				|| type == ColorElementType.GREEN
 				|| type == ColorElementType.BLUE)
@@ -108,24 +122,23 @@ public class ImageManipulator implements Cloneable
 
 		int[] pixelDataRGB = new int[3];
 		float[] pixelDataHSB = new float[3];
-		imgSrc.getData().getPixel(x, y, pixelDataRGB);
-		Color.RGBtoHSB(pixelDataRGB[0], pixelDataRGB[1], pixelDataRGB[2],
-				pixelDataHSB);
+		imgRaster.getPixel(x, y, pixelDataRGB);
+		Color.RGBtoHSB(pixelDataRGB[0], pixelDataRGB[1], pixelDataRGB[2], pixelDataHSB);
 		float result = -1;
 
 		switch (type)
 		{
-		case HUE:
-			result = pixelDataHSB[0];
-			break;
-		case SAT:
-			result = pixelDataHSB[1];
-			break;
-		case BRIGHT:
-			result = pixelDataHSB[2];
-			break;
-		default:
-			break;
+			case HUE:
+				result = pixelDataHSB[0];
+				break;
+			case SAT:
+				result = pixelDataHSB[1];
+				break;
+			case BRIGHT:
+				result = pixelDataHSB[2];
+				break;
+			default:
+				break;
 		}
 
 		return result;
@@ -134,13 +147,13 @@ public class ImageManipulator implements Cloneable
 	public int[] getPixelRGB(int x, int y)
 	{
 		// Precondition
-		if (x < 0 || x >= imgSrc.getWidth() || y < 0 || y >= imgSrc.getHeight())
+		if (x < 0 || x >= width || y < 0 || y >= height)
 		{
 			throw new IllegalArgumentException();
 		}
 
 		int[] pixelData = new int[3];
-		imgSrc.getData().getPixel(x, y, pixelData);
+		imgRaster.getPixel(x, y, pixelData);
 
 		return pixelData;
 	}
@@ -148,20 +161,20 @@ public class ImageManipulator implements Cloneable
 	public void setPixelRGB(int x, int y, int[] pixelData)
 	{
 		// Precondition
-		if (x < 0 || x >= imgSrc.getWidth() || y < 0 || y >= imgSrc.getHeight()
+		if (x < 0 || x >= width || y < 0 || y >= height
 				|| pixelData == null)
 		{
 			throw new IllegalArgumentException();
 		}
 
-		imgSrc.getRaster().setPixel(x, y, pixelData);
+		imgWriteRaster.setPixel(x, y, pixelData);
 
 	}
 
 	public void setPixelHSB(int x, int y, float[] pixelData)
 	{
 		// Precondition
-		if (x < 0 || x >= imgSrc.getWidth() || y < 0 || y >= imgSrc.getHeight()
+		if (x < 0 || x >= width || y < 0 || y >= height
 				|| pixelData == null)
 		{
 			throw new IllegalArgumentException();
@@ -176,14 +189,14 @@ public class ImageManipulator implements Cloneable
 	public float[] getPixelHSB(int x, int y)
 	{
 		// Precondition
-		if (x < 0 || x >= imgSrc.getWidth() || y < 0 || y >= imgSrc.getHeight())
+		if (x < 0 || x >= width || y < 0 || y >= height)
 		{
 			throw new IllegalArgumentException();
 		}
 
 		int[] pixelDataRGB = new int[3];
 		float[] pixelDataHSB = new float[3];
-		imgSrc.getData().getPixel(x, y, pixelDataRGB);
+		imgRaster.getPixel(x, y, pixelDataRGB);
 		Color.RGBtoHSB(pixelDataRGB[0], pixelDataRGB[1], pixelDataRGB[2],
 				pixelDataHSB);
 
@@ -206,12 +219,12 @@ public class ImageManipulator implements Cloneable
 
 	public int getWidth()
 	{
-		return imgSrc.getWidth();
+		return width;
 	}
 
 	public int getHeight()
 	{
-		return imgSrc.getHeight();
+		return height;
 	}
 
 }
