@@ -42,12 +42,11 @@ public class ImageManipulator implements Cloneable
 	}
 
 	@Override
-	protected Object clone() throws CloneNotSupportedException
+	public Object clone() throws CloneNotSupportedException
 	{
 		WritableRaster dstWrite = imgSrc.copyData(null);
 
-		BufferedImage imgDst = new BufferedImage(imgSrc.getWidth(), imgSrc
-				.getHeight(), BufferedImage.TYPE_INT_RGB);
+		BufferedImage imgDst = new BufferedImage(imgSrc.getWidth(), imgSrc.getHeight(), BufferedImage.TYPE_INT_RGB);
 		
 		imgDst.setData(dstWrite);
 
@@ -201,10 +200,7 @@ public class ImageManipulator implements Cloneable
 		}
 
 		// Now we save the file
-		BufferedImage imgDst = new BufferedImage(imgSrc.getWidth(), imgSrc
-				.getHeight(), BufferedImage.TYPE_INT_RGB);
-
-		ImageIO.write(imgDst, "jpg", new File(fileName));
+		ImageIO.write(imgSrc, "jpg", new File(fileName));
 
 	}
 
