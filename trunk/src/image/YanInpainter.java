@@ -73,7 +73,7 @@ public class YanInpainter implements Inpaintable
 		int ringWidth;
 
 		// Borrar esta linea:
-		int[] pixelToSave = null;
+		int[] pixelToSave = new int[3];
 		
 		// At first, the first ring matches with the image dimensions.
 		ring = 0;
@@ -81,14 +81,19 @@ public class YanInpainter implements Inpaintable
 		ringWidth = imgWidth;
 		while(ring < ringCount)
 		{
+			pixelToSave[0] = (int)Math.abs(Math.random() * 255);
+			pixelToSave[1] = (int)Math.abs(Math.random() * 255);
+			pixelToSave[2] = (int)Math.abs(Math.random() * 255);
+			
+			
 			for (x = ring; x < ringWidth; x++)
 			{
 				for (y = ring; y < ringHeight; y++)
 				{
 					if (pixelInRing(x, y, ring, ringWidth, ringHeight) && mask.isMarked(x, y))
 					{
-//						inpaintPixel(result, mask, x, y);
-						pixelToSave = inpaintUsingRGB(result, mask, x, y);
+//						pixelToSave = inpaintPixel(result, mask, x, y);
+//						pixelToSave = inpaintUsingRGB(result, mask, x, y);
 						
 						if (pixelToSave != null)
 						{
@@ -113,8 +118,8 @@ public class YanInpainter implements Inpaintable
 			
 			// We must set the next ring limits
 			ring++;			
-			ringHeight = imgHeight - ring;
 			ringWidth = imgWidth - ring;
+			ringHeight = imgHeight - ring;
 		}
 		
 		return result;
@@ -141,7 +146,29 @@ public class YanInpainter implements Inpaintable
 			throw new IllegalArgumentException();
 		}
 
-		return (x >= ring && x < (ring + width) && y >= ring && y < (ring + height));
+//		return (x >= ring && x < (ring + width) && y >= ring && y < (ring + height));
+		
+		if (x == ring)
+		{
+			return (y >= ring && y < height)? true : false;
+		}
+		
+		if (x == (width - 1))
+		{
+			return (y >= ring && y < height)? true : false;
+		}
+		
+		if (y == ring)
+		{
+			return (x >= ring && x < width)? true:false;
+		}
+		else if (y == (height - 1))
+		{
+			return (x >= ring && x < width)? true:false;
+		}
+		
+		// if reach here, cannot be inside a ring
+		return false;		
 	}
 
 	/**
@@ -193,6 +220,12 @@ public class YanInpainter implements Inpaintable
 			}
 		}
 
+		// If sumCount is zero, no pure pixel was used, and must return null 
+		if (sumCount == 0)
+		{
+			return null;
+		}
+		
 		accum[0] /= sumCount;
 		accum[1] /= sumCount;
 		accum[2] /= sumCount;
@@ -298,7 +331,7 @@ public class YanInpainter implements Inpaintable
 		}
 		
 		// Now we can set the pixel
-//		img.setPixelRGB(x, y, accum);
+		img.setPixelRGB(x, y, accum);
 		
 		return accum;
 		
