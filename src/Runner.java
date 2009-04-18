@@ -43,7 +43,7 @@ public class Runner
 			System.exit(1);
 		}
 		
-		System.out.println("Inpaint successfully done"); 
+		System.out.println("Inpaint successfully done!"); 
 	}
 
 }

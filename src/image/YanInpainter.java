@@ -81,20 +81,14 @@ public class YanInpainter implements Inpaintable
 		ringWidth = imgWidth;
 		while(ring < ringCount)
 		{
-			pixelToSave[0] = (int)Math.abs(Math.random() * 255);
-			pixelToSave[1] = (int)Math.abs(Math.random() * 255);
-			pixelToSave[2] = (int)Math.abs(Math.random() * 255);
-			
-			
 			for (x = ring; x < ringWidth; x++)
 			{
 				for (y = ring; y < ringHeight; y++)
 				{
 					if (pixelInRing(x, y, ring, ringWidth, ringHeight) && mask.isMarked(x, y))
 					{
-//						pixelToSave = inpaintPixel(result, mask, x, y);
-//						pixelToSave = inpaintUsingRGB(result, mask, x, y);
-						
+//						inpaintPixel(result, mask, x, y);
+						pixelToSave = inpaintUsingRGB(result, mask, x, y);				
 						if (pixelToSave != null)
 						{
 							result.setPixelRGB(x, y, pixelToSave);
@@ -145,26 +139,15 @@ public class YanInpainter implements Inpaintable
 		{
 			throw new IllegalArgumentException();
 		}
-
-//		return (x >= ring && x < (ring + width) && y >= ring && y < (ring + height));
 		
-		if (x == ring)
+		if (x == ring || x == (width - 1))
 		{
 			return (y >= ring && y < height)? true : false;
 		}
 		
-		if (x == (width - 1))
+		if (y == ring || y == (height - 1))
 		{
-			return (y >= ring && y < height)? true : false;
-		}
-		
-		if (y == ring)
-		{
-			return (x >= ring && x < width)? true:false;
-		}
-		else if (y == (height - 1))
-		{
-			return (x >= ring && x < width)? true:false;
+			return (x >= ring && x < width)? true : false;
 		}
 		
 		// if reach here, cannot be inside a ring
@@ -192,13 +175,12 @@ public class YanInpainter implements Inpaintable
 		}
 		
 		
-		int[][] directions = { { 1, 1 }, { 1, 0 }, { 1, -1 }, { 0, -1 },
-				{ -1, -1 }, { -1, 0 }, { -1, 1 }, { 0, 1 } };
-		float[] accum = new float[3];
+		int[][] directions = { { 1, 1 }, { 1, 0 }, { 1, -1 }, { 0, -1 }, { -1, -1 }, { -1, 0 }, 
+			{ -1, 1 }, { 0, 1 } };
+		float[] accum = {0.0F, 0.0F, 0.0F};
 		float[] color;
 		int sumCount = 0;
-		int newX;
-		int newY;
+		int newX, newY;
 		int width = img.getWidth();
 		int height = img.getHeight();
 
@@ -281,16 +263,16 @@ public class YanInpainter implements Inpaintable
 			throw new IllegalArgumentException();
 		}
 		
+		int[] pixelAtXY = img.getPixelRGB(x, y);
 		
-		int[][] directions = { { 1, 1 }, { 1, 0 }, { 1, -1 }, { 0, -1 },
-				{ -1, -1 }, { -1, 0 }, { -1, 1 }, { 0, 1 } };
+		int[][] directions = { { 1, 1 }, { 1, 0 }, { 1, -1 }, { 0, -1 }, { -1, -1 }, { -1, 0 }, 
+			{ -1, 1 }, { 0, 1 } };
 		int[] accum = {0, 0, 0};
 		int[] color;
+		int newX,newY;
 		
 		// sumCount has the number of pure pixel used
 		int sumCount = 0;
-		int newX;
-		int newY;
 		int width = img.getWidth();
 		int height = img.getHeight();
 		
@@ -331,7 +313,7 @@ public class YanInpainter implements Inpaintable
 		}
 		
 		// Now we can set the pixel
-		img.setPixelRGB(x, y, accum);
+//		img.setPixelRGB(x, y, accum);
 		
 		return accum;
 		
