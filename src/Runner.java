@@ -39,7 +39,11 @@ public class Runner
 		} catch (Exception e)
 		{
 			e.printStackTrace();
+			System.err.println("Some Error ocurred.");
+			System.exit(1);
 		}
+		
+		System.out.println("Inpaint successfully done"); 
 	}
 
 }
