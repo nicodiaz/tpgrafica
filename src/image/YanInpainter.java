@@ -81,40 +81,52 @@ public class YanInpainter implements Inpaintable
 		ringWidth = imgWidth;
 		while(ring < ringCount)
 		{
-			for (x = ring; x < ringWidth; x++)
+			for (y = ring; y < ringHeight; y++)
 			{
-				for (y = ring; y < ringHeight; y++)
+				pixelToSave = new int[]{255,255,ring};
+				for (x = ring; x < ringWidth; x++)
 				{
+					
+					
 					if (pixelInRing(x, y, ring, ringWidth, ringHeight) && mask.isMarked(x, y))
 					{
+						
+						
 //						inpaintPixel(result, mask, x, y);
-						pixelToSave = inpaintUsingRGB(result, mask, x, y);				
+						pixelToSave = inpaintUsingRGB(result, mask, x, y);	
 						if (pixelToSave != null)
-						{
+						{	
 							result.setPixelRGB(x, y, pixelToSave);
 						}
+						
 					}
 				}
+				
 			}
+			
+		
+			
 			
 			// Now we must mark the circle in the mask
 			// Podria mejorarse esto...
-			for (x = ring; x < ringWidth; x++)
+			for (y = ring; y < ringHeight; y++)
 			{
-				for (y = ring; y < ringHeight; y++)
+				for (x = ring; x < ringWidth; x++)
 				{
 					if (pixelInRing(x, y, ring, ringWidth, ringHeight) && mask.isMarked(x, y))
 					{
 						mask.unMark(x, y);
+
 					}
 				}
 			}
 			
 			// We must set the next ring limits
 			ring++;			
-			ringWidth = imgWidth - ring;
-			ringHeight = imgHeight - ring;
+			ringWidth --;
+			ringHeight --;
 		}
+
 		
 		return result;
 	}
@@ -142,12 +154,12 @@ public class YanInpainter implements Inpaintable
 		
 		if (x == ring || x == (width - 1))
 		{
-			return (y >= ring && y < height)? true : false;
+			return (y >= ring && y < ring + height)? true : false;
 		}
 		
 		if (y == ring || y == (height - 1))
 		{
-			return (x >= ring && x < width)? true : false;
+			return (x >= ring && x < ring + width)? true : false;
 		}
 		
 		// if reach here, cannot be inside a ring

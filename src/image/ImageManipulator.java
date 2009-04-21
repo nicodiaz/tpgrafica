@@ -155,7 +155,12 @@ public class ImageManipulator implements Cloneable
 		int[] pixelData = new int[3];
 		imgRaster.getPixel(x, y, pixelData);
 
-		return pixelData;
+		Color r = new Color(imgSrc.getRGB(x,y));
+		int [] ret = new int[3];
+		ret[0] = r.getRed();
+		ret[1] = r.getGreen();
+		ret[2] = r.getBlue();
+		return ret;
 	}
 
 	public void setPixelRGB(int x, int y, int[] pixelData)
