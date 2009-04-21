@@ -56,7 +56,7 @@ public class Mask extends ImageManipulator
 
 		int[] pixel = this.getPixelRGB(x, y);
 
-		return (pixel[0] == maskMark[0] && pixel[1] == maskMark[1] && pixel[2] == maskMark[2]);
+		return (Math.abs(pixel[0] - maskMark[0]) < 10 && Math.abs(pixel[1] - maskMark[1]) < 10 && Math.abs(pixel[2] - maskMark[2]) < 10);
 	}
 
 	public void unMark(int x, int y)
