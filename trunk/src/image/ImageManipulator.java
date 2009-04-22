@@ -34,6 +34,22 @@ public class ImageManipulator implements Cloneable
 		width = imgSrc.getWidth();
 		height = imgSrc.getHeight();
 	}
+	
+	public ImageManipulator(File imgFile) throws IOException
+	{
+		
+		// Preconditions
+		if (imgFile == null)
+		{
+			throw new IllegalArgumentException();
+		}
+		
+		imgSrc = ImageIO.read(imgFile);
+		imgRaster = imgSrc.getData();
+		imgWriteRaster = imgSrc.getRaster();
+		width = imgSrc.getWidth();
+		height = imgSrc.getHeight();	
+	}
 
 	public ImageManipulator(BufferedImage imgSrc)
 	{
@@ -230,6 +246,11 @@ public class ImageManipulator implements Cloneable
 	public int getHeight()
 	{
 		return height;
+	}
+	
+	public BufferedImage getImageSrc()
+	{
+		return imgSrc;
 	}
 
 }
